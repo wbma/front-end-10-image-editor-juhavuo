@@ -18,12 +18,16 @@ export class EditorProvider {
   pixels: any;
   numPixels: number;
   functions: any = {
-    brightContrast: this.brightContrast,
+    brightContrast: this.brightContrast
+  };
+  functions2: any = {
+    colorFilter: this.colorFilter
   };
 
   // editor variables
   contrast: string = '10';
   brightness: string = '0';
+  reddness: string = '0';
 
   constructor(public http: HttpClient, private file: File) {
     console.log('Hello EditorProvider Provider');
@@ -75,7 +79,16 @@ export class EditorProvider {
         this.functions[i](this);
       }
     }
+  }
 
+  applyFilters2() {
+    this.resetImage();
+
+    for (let i in this.functions2) {
+      if (this.functions2.hasOwnProperty(i)) {
+        this.functions2[i](this);
+      }
+    }
   }
 
   // filters
@@ -99,6 +112,37 @@ export class EditorProvider {
     thisClass.context.putImageData(thisClass.imageData, 0, 0);
 
   };
+
+  colorFilter(thisClass){
+    let contrast = parseFloat(thisClass.contrast)/10;
+    let reddness = parseInt(thisClass.reddness);
+    for (let i = 0; i < thisClass.numPixels; i++) {
+      thisClass.pixels[i * 4] = (thisClass.pixels[i * 4] - 128) * contrast + 128 +
+        reddness; // Red
+
+      thisClass.pixels[i * 4 + 1] = 0; // Green
+      thisClass.pixels[i * 4 + 2] = 0; // Blue
+    }
+
+    thisClass.context.clearRect(0, 0, thisClass.canvas.width, thisClass.canvas.height);
+    thisClass.context.putImageData(thisClass.imageData, 0, 0);
+  };
+
+  autoContrast(thisClass){
+    let contrast = parseFloat(thisClass.contrast)/10;
+    let brightness = parseInt(thisClass.brightness);
+    for (let i = 0; i < thisClass.numPixels; i++) {
+      thisClass.pixels[i * 4] = (thisClass.pixels[i * 4] - 128) * contrast + 128 +
+        brightness; // Red
+      thisClass.pixels[i * 4 + 1] = (thisClass.pixels[i * 4 + 1] - 128) * contrast +
+        128 + brightness; // Green
+      thisClass.pixels[i * 4 + 2] = (thisClass.pixels[i * 4 + 2] - 128) * contrast +
+        128 + brightness; // Blue
+    }
+
+    thisClass.context.clearRect(0, 0, thisClass.canvas.width, thisClass.canvas.height);
+    thisClass.context.putImageData(thisClass.imageData, 0, 0);
+  }
 
   getExif(img) {
     let latLon: any;

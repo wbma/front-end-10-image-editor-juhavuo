@@ -29,5 +29,11 @@
                 <ion-icon range-right name="sunny"></ion-icon>
             </ion-range>
         </ion-item>
-    </ion-list>
+      <ion-item>
+        <ion-label>Color time</ion-label>
+        <ion-range [debounce]="500" min="-255" max="255" step="1" [(ngModel)]="editorProvider.brightness"
+                   (ionChange)="editorProvider.applyFilters2()">
+        </ion-range>
+      </ion-item>
+  </ion-list>
 </ion-content>
